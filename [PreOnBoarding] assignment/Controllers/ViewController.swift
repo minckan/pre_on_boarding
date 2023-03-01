@@ -79,21 +79,25 @@ extension ViewController : UITableViewDataSource {
         cell.mainImageView.image = UIImage(named: "noimage")
         
         cell.loadImageAction = { [unowned self] in
-            let timeOutDuration = 2.0
-            var timer: Timer?
-            self.imageDownload(url: imageArray[indexPath.row].imageStr!, indexPath: indexPath) { image in
-                
-                DispatchQueue.main.async {
-                    cell.mainImageView.image = image
-                    timer = Timer.scheduledTimer(withTimeInterval: timeOutDuration, repeats: false) { timer in
-                        cell.mainImageView.image = UIImage(named: "noimage")
-                        }
+            
+            DispatchQueue.global().sync {
+                let timeOutDuration = 2.0
+                var timer: Timer?
+                self.imageDownload(url: imageArray[indexPath.row].imageStr!, indexPath: indexPath) { image in
+                    
+                    DispatchQueue.main.sync {
+                        cell.mainImageView.image = image
+                        timer = Timer.scheduledTimer(withTimeInterval: timeOutDuration, repeats: false) { timer in
+                            cell.mainImageView.image = UIImage(named: "noimage")
+                            }
+                    }
+                   
+                    
+          
+                    
                 }
-               
-                
-      
-                
             }
+
         }
         
         return cell
