@@ -46,15 +46,9 @@ class ViewController: UIViewController {
                     return
                 }
             
-            DispatchQueue.global().async { [weak self] in
-                
-                self?.imageArray[indexPath.row].image = image
-                
-                guard let image = self?.imageArray[indexPath.row].image else {return}
-                
-                completion(image)
-                
-            }
+            self.imageArray[indexPath.row].image = image
+            guard let image = self.imageArray[indexPath.row].image else {return}
+            completion(image)
             
         }.resume()
     }
@@ -80,21 +74,15 @@ extension ViewController : UITableViewDataSource {
         
         cell.loadImageAction = { [unowned self] in
             
-            DispatchQueue.global().sync {
-                let timeOutDuration = 2.0
-                var timer: Timer?
-                self.imageDownload(url: imageArray[indexPath.row].imageStr!, indexPath: indexPath) { image in
-                    
-                    DispatchQueue.main.sync {
-                        cell.mainImageView.image = image
-                        timer = Timer.scheduledTimer(withTimeInterval: timeOutDuration, repeats: false) { timer in
-                            cell.mainImageView.image = UIImage(named: "noimage")
-                            }
+            let timeOutDuration = 2.0
+            var timer: Timer?
+            self.imageDownload(url: imageArray[indexPath.row].imageStr!, indexPath: indexPath) { image in
+                
+                DispatchQueue.main.async {
+                    cell.mainImageView.image = image
+                    timer = Timer.scheduledTimer(withTimeInterval: timeOutDuration, repeats: false) { timer in
+                        cell.mainImageView.image = UIImage(named: "noimage")
                     }
-                   
-                    
-          
-                    
                 }
             }
 
